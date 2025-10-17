@@ -222,9 +222,8 @@ export function AppSidebar({
 
   // Get agents and chats from InstantDB
   const { agents, createAgent: createAgentInDB } = useAgents();
-  const { chats, createChat, updateChat, deleteChat } = useChats(
-    activeItem?.agentId,
-  );
+  // Fetch ALL chats (no filter) so we have access to all agent chats
+  const { chats: allChats, createChat, updateChat, deleteChat } = useChats();
 
   // Set initial active item
   React.useEffect(() => {
@@ -302,11 +301,16 @@ export function AppSidebar({
     return [...defaultItems, ...agentItems];
   }, [agents]);
 
-  // Convert DB chats to ChatThread format
+  // Convert DB chats to ChatThread format and filter by active agent
   const threads = React.useMemo(() => {
-    return chats
-      .sort((a, b) => b.updatedAt - a.updatedAt) // Sort newest first
-      .map((chat) => ({
+    // Filter chats for the current active agent
+    const filteredChats = activeItem?.agentId
+      ? allChats.filter((chat: any) => chat.agentId === activeItem.agentId)
+      : allChats;
+    
+    return filteredChats
+      .sort((a: any, b: any) => b.updatedAt - a.updatedAt) // Sort newest first
+      .map((chat: any) => ({
         id: chat.id,
         title: chat.title,
         lastMessage: chat.lastMessage || '',
@@ -314,7 +318,7 @@ export function AppSidebar({
         agentType: chat.agentType,
         messageCount: chat.messageCount,
       }));
-  }, [chats]);
+  }, [allChats, activeItem?.agentId]);
 
   function formatTimestamp(timestamp: number): string {
     const now = Date.now();
@@ -379,13 +383,13 @@ export function AppSidebar({
                         onAgentSelect?.(item);
 
                         // Auto-select the newest chat for this agent OR create one if none exist
-                        const agentChats = chats.filter(
-                          (chat) => chat.agentId === item.agentId,
+                        const agentChats = allChats.filter(
+                          (chat: any) => chat.agentId === item.agentId,
                         );
                         if (agentChats.length > 0) {
                           // Sort by timestamp/createdAt and select newest
                           const sortedChats = agentChats.sort(
-                            (a, b) => b.createdAt - a.createdAt,
+                            (a: any, b: any) => b.createdAt - a.createdAt,
                           );
                           const newestChat = sortedChats[0];
                           if (newestChat) {
@@ -491,7 +495,7 @@ export function AppSidebar({
         <SidebarContent className="overflow-x-hidden">
           <SidebarGroup className="px-0 w-full">
             <SidebarGroupContent className="w-full">
-              {threads.map((thread) => (
+              {threads.map((thread: any) => (
                 <div
                   key={thread.id}
                   className={`group relative hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight last:border-b-0 transition-colors ${
