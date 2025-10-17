@@ -1,31 +1,40 @@
-# shadcn/ui monorepo template
+# AI Multi-Agent Chat with RAG
 
-This template is for creating a monorepo with shadcn/ui.
+> **📖 For full documentation, see [PROJECT_README.md](./PROJECT_README.md)**
 
-## Usage
+A production-ready AI chat application with multi-agent orchestration and RAG for document analysis.
+
+**Live Demo:** [servimatt.brew.build](https://servimatt.brew.build)
+
+## Features
+
+- 🤖 Multi-agent system with OpenAI Agents SDK
+- 📄 RAG implementation (CSV, JSON, MD, XLSX, TXT)
+- ⚡ Real-time sync with InstantDB
+- 🎨 Modern UI with shadcn/ui
+- 🚀 Deployed on Vercel
+
+## Quick Start
 
 ```bash
-pnpm dlx shadcn@latest init
+# Install dependencies
+pnpm install
+
+# Configure environment (see PROJECT_README.md)
+cp apps/web/.env.local.example apps/web/.env.local
+
+# Run development server
+pnpm dev
 ```
 
-## Adding components
+Visit `http://localhost:1290`
 
-To add components to your app, run the following command at the root of your `web` app:
+## Architecture
 
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
+Monorepo with:
 
-This will place the ui components in the `packages/ui/src/components` directory.
+- `apps/web` - Next.js 15 application
+- `packages/agent-core` - OpenAI Agents SDK configuration
+- `packages/ui` - Shared shadcn/ui components
 
-## Tailwind
-
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
-
-## Using components
-
-To use the components in your app, import them from the `ui` package.
-
-```tsx
-import { Button } from "@workspace/ui/components/button"
-```
+See [PROJECT_README.md](./PROJECT_README.md) for complete documentation.
