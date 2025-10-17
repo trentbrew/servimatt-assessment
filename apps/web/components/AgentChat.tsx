@@ -16,13 +16,6 @@ import {
 } from 'lucide-react';
 import { db } from '@/lib/instant';
 import ReactMarkdown from 'react-markdown';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@workspace/ui/components/card';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { ScrollArea } from '@workspace/ui/components/scroll-area';
@@ -182,11 +175,24 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
       }
 
       const uploadResult = await uploadResponse.json();
-      setAttachedFiles((prev) => [...prev, ...uploadResult.files]);
+      
+      // Handle partial successes
+      if (uploadResult.files && uploadResult.files.length > 0) {
+        setAttachedFiles((prev) => [...prev, ...uploadResult.files]);
+      }
+      
+      // Show warnings for any errors
+      if (uploadResult.errors && uploadResult.errors.length > 0) {
+        console.warn('Some files failed to upload:', uploadResult.errors);
+        alert(
+          `Some files failed:\n${uploadResult.errors.join('\n')}\n\n${uploadResult.files?.length || 0} files uploaded successfully.`
+        );
+      }
     } catch (error) {
       console.error('File upload error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       alert(
-        `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Upload failed: ${errorMessage}\n\nPlease try again or contact support if the issue persists.`,
       );
     } finally {
       setIsUploading(false);
@@ -337,8 +343,8 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
   };
 
   return (
-    <Card className="flex flex-col h-full max-w-2xl w-full !border-none">
-      <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
+    <div className="flex flex-col h-full w-full items-center">
+      <div className="flex flex-col h-full max-w-2xl w-full relative">
         <div ref={scrollRef} className="flex-1 p-4 pb-32 overflow-y-auto">
           {!chatId && (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
@@ -468,7 +474,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
 
         <form
           onSubmit={handleSubmit}
-          className="sticky bottom-0 p-4 bg-background/95 backdrop-blur-sm border-t mt-auto w-full"
+          className="absolute bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t"
         >
           {/* File Attachments */}
           {attachedFiles.length > 0 && (
@@ -537,7 +543,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
             className="hidden"
           />
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

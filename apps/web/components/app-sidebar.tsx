@@ -16,6 +16,8 @@ import {
   BookOpen,
   Calculator,
   Palette,
+  MoreHorizontal,
+  Pencil,
 } from 'lucide-react';
 
 import { NavUser } from '@/components/nav-user';
@@ -206,11 +208,13 @@ export function AppSidebar({
     null,
   );
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+  const [editingThreadId, setEditingThreadId] = React.useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = React.useState('');
   const { setOpen } = useSidebar();
 
   // Get agents and chats from InstantDB
   const { agents, createAgent: createAgentInDB } = useAgents();
-  const { chats, createChat } = useChats(activeItem?.agentId);
+  const { chats, createChat, updateChat, deleteChat } = useChats(activeItem?.agentId);
 
   // Set initial active item
   React.useEffect(() => {
@@ -355,11 +359,11 @@ export function AppSidebar({
                         children: item.title,
                         hidden: false,
                       }}
-                      onClick={() => {
+                      onClick={async () => {
                         setActiveItem(item);
                         onAgentSelect?.(item);
                         
-                        // Auto-select the newest chat for this agent
+                        // Auto-select the newest chat for this agent OR create one if none exist
                         const agentChats = chats.filter(chat => chat.agentId === item.agentId);
                         if (agentChats.length > 0) {
                           // Sort by timestamp/createdAt and select newest
@@ -377,7 +381,29 @@ export function AppSidebar({
                             onThreadSelect?.(newestChat as any);
                           }
                         } else {
-                          setSelectedThread(null);
+                          // No chats exist - create one automatically (if agent has ID)
+                          if (item.agentId) {
+                            const newChatId = await createChat({
+                              agentId: item.agentId,
+                              title: `New ${item.title} Chat`,
+                              agentType: item.agentType,
+                            });
+                            
+                            const newThread = {
+                              id: newChatId,
+                              title: `New ${item.title} Chat`,
+                              agentType: item.agentType,
+                              lastMessage: '',
+                              timestamp: 'Just now',
+                              messageCount: 0,
+                            };
+                            
+                            setSelectedThread(newThread);
+                            onThreadSelect?.(newThread);
+                          } else {
+                            // For "All Chats" or items without agentId, just clear selection
+                            setSelectedThread(null);
+                          }
                         }
                         setOpen(true);
                       }}
@@ -445,34 +471,93 @@ export function AppSidebar({
           <SidebarGroup className="px-0">
             <SidebarGroupContent>
               {threads.map((thread) => (
-                <button
+                <div
                   key={thread.id}
-                  onClick={() => {
-                    setSelectedThread(thread);
-                    onThreadSelect?.(thread);
-                  }}
-                  className={`hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0 w-full text-left transition-colors ${
+                  className={`group relative hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0 w-full transition-colors ${
                     selectedThread?.id === thread.id ? 'bg-sidebar-accent' : ''
                   }`}
                 >
-                  <div className="flex w-full items-center gap-2">
-                    <span className="font-medium">{thread.title}</span>
-                    <span className="ml-auto text-xs text-muted-foreground">
-                      {thread.timestamp}
+                  <div
+                    onClick={() => {
+                      if (editingThreadId !== thread.id) {
+                        setSelectedThread(thread);
+                        onThreadSelect?.(thread);
+                      }
+                    }}
+                    className="w-full cursor-pointer"
+                  >
+                    <div className="flex w-full items-center gap-2">
+                      {editingThreadId === thread.id ? (
+                        <input
+                          type="text"
+                          value={editingTitle}
+                          onChange={(e) => setEditingTitle(e.target.value)}
+                          onBlur={async () => {
+                            if (editingTitle.trim()) {
+                              await updateChat(thread.id, { title: editingTitle.trim() });
+                            }
+                            setEditingThreadId(null);
+                          }}
+                          onKeyDown={async (e) => {
+                            if (e.key === 'Enter') {
+                              if (editingTitle.trim()) {
+                                await updateChat(thread.id, { title: editingTitle.trim() });
+                              }
+                              setEditingThreadId(null);
+                            } else if (e.key === 'Escape') {
+                              setEditingThreadId(null);
+                            }
+                          }}
+                          autoFocus
+                          className="font-medium bg-transparent border-none outline-none focus:outline-none flex-1 text-foreground"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      ) : (
+                        <span className="font-medium flex-1">{thread.title}</span>
+                      )}
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingThreadId(thread.id);
+                            setEditingTitle(thread.title);
+                          }}
+                          className="p-1 hover:bg-muted rounded"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (confirm(`Delete "${thread.title}"?`)) {
+                              await deleteChat(thread.id);
+                              if (selectedThread?.id === thread.id) {
+                                setSelectedThread(null);
+                              }
+                            }
+                          }}
+                          className="p-1 hover:bg-destructive/10 hover:text-destructive rounded"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {thread.timestamp}
+                      </span>
+                    </div>
+                    <span className="line-clamp-1 w-[260px] text-xs text-muted-foreground mt-1">
+                      {thread.lastMessage}
                     </span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize">
+                        {thread.agentType}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {thread.messageCount} messages
+                      </span>
+                    </div>
                   </div>
-                  <span className="line-clamp-1 w-[260px] text-xs text-muted-foreground">
-                    {thread.lastMessage}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize">
-                      {thread.agentType}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {thread.messageCount} messages
-                    </span>
-                  </div>
-                </button>
+                </div>
               ))}
             </SidebarGroupContent>
           </SidebarGroup>
