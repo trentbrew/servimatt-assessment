@@ -495,7 +495,11 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
 
         <form
           onSubmit={handleSubmit}
-          className={`fixed bottom-0 p-4 bg-background/95 backdrop-blur-sm border-t w-xl ${!isCollapsed ? 'ml-12' : ''}`}
+          className="fixed bottom-0 p-4 bg-background/75 backdrop-blur-sm border-t transition-[left]"
+          style={{
+            left: state === 'expanded' ? 'var(--sidebar-width)' : '3rem',
+            right: 0,
+          }}
         >
           {/* File Attachments */}
           {attachedFiles.length > 0 && (
