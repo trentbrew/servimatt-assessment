@@ -1,10 +1,33 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { ArchiveX, Command, File, Inbox, Send, Trash2 } from "lucide-react"
+import * as React from 'react';
+import {
+  ArchiveX,
+  Command,
+  File,
+  Inbox,
+  Send,
+  Trash2,
+  MessageSquare,
+  Plus,
+  Bot,
+  Sparkles,
+  Brain,
+  BookOpen,
+  Calculator,
+  Palette,
+} from 'lucide-react';
 
-import { NavUser } from "@/components/nav-user"
-import { Label } from "@workspace/ui/components/label"
+import { NavUser } from '@/components/nav-user';
+import { CreateAgentModal, CustomAgent } from '@/components/CreateAgentModal';
+import { useAgents, useChats } from '@/hooks/useAgents';
+import { db } from '@/lib/instant';
+import { Label } from '@workspace/ui/components/label';
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from '@workspace/ui/components/avatar';
 import {
   Sidebar,
   SidebarContent,
@@ -17,143 +40,279 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@workspace/ui/components/sidebar"
-import { Switch } from "@workspace/ui/components/switch"
+} from '@workspace/ui/components/sidebar';
+import { Switch } from '@workspace/ui/components/switch';
+
+// Chat thread data structure
+export interface ChatThread {
+  id: string;
+  title: string;
+  lastMessage: string;
+  timestamp: string;
+  agentType: 'math' | 'history' | 'general' | string;
+  messageCount: number;
+}
+
+// Icon mapping for custom agents
+const ICON_MAP: Record<string, any> = {
+  bot: Bot,
+  sparkles: Sparkles,
+  brain: Brain,
+  book: BookOpen,
+  calculator: Calculator,
+  palette: Palette,
+};
+
+// Component to display avatar from file ID
+function AvatarWithFile({
+  fileId,
+  fallbackIcon,
+}: {
+  fileId: string;
+  fallbackIcon: any;
+}) {
+  const { data } = db.useQuery({
+    $files: {
+      $: { where: { id: fileId } },
+    },
+  });
+
+  const fileUrl = data?.$files?.[0]?.url;
+  const FallbackIcon = fallbackIcon;
+
+  return (
+    <Avatar className="w-5 h-5">
+      {fileUrl && <AvatarImage src={fileUrl} alt="Agent avatar" className="object-cover" />}
+      <AvatarFallback className="w-5 h-5">
+        <FallbackIcon className="w-3 h-3" />
+      </AvatarFallback>
+    </Avatar>
+  );
+}
 
 // This is sample data
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: 'shadcn',
+    email: 'm@example.com',
+    avatar: 'https://github.com/shadcn.png',
   },
   navMain: [
     {
-      title: "Inbox",
-      url: "#",
-      icon: Inbox,
+      title: 'All Chats',
+      url: '#',
+      icon: MessageSquare,
       isActive: true,
     },
     {
-      title: "Drafts",
-      url: "#",
+      title: 'Math Tutor',
+      url: '#',
       icon: File,
       isActive: false,
     },
     {
-      title: "Sent",
-      url: "#",
+      title: 'History Tutor',
+      url: '#',
       icon: Send,
       isActive: false,
     },
     {
-      title: "Junk",
-      url: "#",
+      title: 'Archived',
+      url: '#',
       icon: ArchiveX,
       isActive: false,
     },
+  ],
+  threads: [
     {
-      title: "Trash",
-      url: "#",
-      icon: Trash2,
-      isActive: false,
+      id: 'thread-1',
+      title: 'Math Homework Help',
+      lastMessage: 'What is 25 × 17?',
+      timestamp: '2 min ago',
+      agentType: 'math' as const,
+      messageCount: 5,
+    },
+    {
+      id: 'thread-2',
+      title: 'World War II Questions',
+      lastMessage: 'When did sharks first appear?',
+      timestamp: '15 min ago',
+      agentType: 'history' as const,
+      messageCount: 8,
+    },
+    {
+      id: 'thread-3',
+      title: 'Algebra Practice',
+      lastMessage: 'Can you help me solve this equation?',
+      timestamp: '1 hour ago',
+      agentType: 'math' as const,
+      messageCount: 12,
+    },
+    {
+      id: 'thread-4',
+      title: 'Ancient Rome Study',
+      lastMessage: 'Tell me about Julius Caesar',
+      timestamp: '2 hours ago',
+      agentType: 'history' as const,
+      messageCount: 6,
+    },
+    {
+      id: 'thread-5',
+      title: 'Geometry Problems',
+      lastMessage: 'Calculate the area of a circle',
+      timestamp: 'Yesterday',
+      agentType: 'math' as const,
+      messageCount: 4,
+    },
+    {
+      id: 'thread-6',
+      title: 'Renaissance Period',
+      lastMessage: 'Who were the key figures?',
+      timestamp: 'Yesterday',
+      agentType: 'history' as const,
+      messageCount: 9,
+    },
+    {
+      id: 'thread-7',
+      title: 'Calculus Help',
+      lastMessage: 'Explain derivatives',
+      timestamp: '2 days ago',
+      agentType: 'math' as const,
+      messageCount: 15,
+    },
+    {
+      id: 'thread-8',
+      title: 'American Revolution',
+      lastMessage: 'What caused the war?',
+      timestamp: '3 days ago',
+      agentType: 'history' as const,
+      messageCount: 7,
     },
   ],
-  mails: [
-    {
-      name: "William Smith",
-      email: "williamsmith@example.com",
-      subject: "Meeting Tomorrow",
-      date: "09:34 AM",
-      teaser:
-        "Hi team, just a reminder about our meeting tomorrow at 10 AM.\nPlease come prepared with your project updates.",
-    },
-    {
-      name: "Alice Smith",
-      email: "alicesmith@example.com",
-      subject: "Re: Project Update",
-      date: "Yesterday",
-      teaser:
-        "Thanks for the update. The progress looks great so far.\nLet's schedule a call to discuss the next steps.",
-    },
-    {
-      name: "Bob Johnson",
-      email: "bobjohnson@example.com",
-      subject: "Weekend Plans",
-      date: "2 days ago",
-      teaser:
-        "Hey everyone! I'm thinking of organizing a team outing this weekend.\nWould you be interested in a hiking trip or a beach day?",
-    },
-    {
-      name: "Emily Davis",
-      email: "emilydavis@example.com",
-      subject: "Re: Question about Budget",
-      date: "2 days ago",
-      teaser:
-        "I've reviewed the budget numbers you sent over.\nCan we set up a quick call to discuss some potential adjustments?",
-    },
-    {
-      name: "Michael Wilson",
-      email: "michaelwilson@example.com",
-      subject: "Important Announcement",
-      date: "1 week ago",
-      teaser:
-        "Please join us for an all-hands meeting this Friday at 3 PM.\nWe have some exciting news to share about the company's future.",
-    },
-    {
-      name: "Sarah Brown",
-      email: "sarahbrown@example.com",
-      subject: "Re: Feedback on Proposal",
-      date: "1 week ago",
-      teaser:
-        "Thank you for sending over the proposal. I've reviewed it and have some thoughts.\nCould we schedule a meeting to discuss my feedback in detail?",
-    },
-    {
-      name: "David Lee",
-      email: "davidlee@example.com",
-      subject: "New Project Idea",
-      date: "1 week ago",
-      teaser:
-        "I've been brainstorming and came up with an interesting project concept.\nDo you have time this week to discuss its potential impact and feasibility?",
-    },
-    {
-      name: "Olivia Wilson",
-      email: "oliviawilson@example.com",
-      subject: "Vacation Plans",
-      date: "1 week ago",
-      teaser:
-        "Just a heads up that I'll be taking a two-week vacation next month.\nI'll make sure all my projects are up to date before I leave.",
-    },
-    {
-      name: "James Martin",
-      email: "jamesmartin@example.com",
-      subject: "Re: Conference Registration",
-      date: "1 week ago",
-      teaser:
-        "I've completed the registration for the upcoming tech conference.\nLet me know if you need any additional information from my end.",
-    },
-    {
-      name: "Sophia White",
-      email: "sophiawhite@example.com",
-      subject: "Team Dinner",
-      date: "1 week ago",
-      teaser:
-        "To celebrate our recent project success, I'd like to organize a team dinner.\nAre you available next Friday evening? Please let me know your preferences.",
-    },
-  ],
+};
+
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  onThreadSelect?: (thread: ChatThread) => void;
+  onAgentSelect?: (agent: any) => void;
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  // Note: I'm using state to show active item.
-  // IRL you should use the url/router.
-  const [activeItem, setActiveItem] = React.useState(data.navMain[0])
-  const [mails, setMails] = React.useState(data.mails)
-  const { setOpen } = useSidebar()
-  const [isClient, setIsClient] = React.useState(false)
+export function AppSidebar({
+  onThreadSelect,
+  onAgentSelect,
+  ...props
+}: AppSidebarProps) {
+  const [activeItem, setActiveItem] = React.useState<any>(null);
+  const [selectedThread, setSelectedThread] = React.useState<ChatThread | null>(
+    null,
+  );
+  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+  const { setOpen } = useSidebar();
 
+  // Get agents and chats from InstantDB
+  const { agents, createAgent: createAgentInDB } = useAgents();
+  const { chats, createChat } = useChats(activeItem?.agentId);
+
+  // Set initial active item
   React.useEffect(() => {
-    setIsClient(true)
-  }, [])
+    if (!activeItem && agents.length > 0) {
+      setActiveItem({
+        title: 'All Chats',
+        agentId: undefined,
+        agentType: 'all',
+      });
+    }
+  }, [agents, activeItem]);
+
+  const handleCreateAgent = async (agent: CustomAgent) => {
+    await createAgentInDB({
+      name: agent.name,
+      icon: agent.icon,
+      personality: agent.personality,
+      expertise: agent.expertise,
+      systemPrompt: agent.systemPrompt,
+      color: agent.color,
+      agentType: agent.id,
+      avatarUrl: agent.avatarUrl,
+    });
+  };
+
+  const handleNewChat = async () => {
+    if (!activeItem) return;
+
+    const chatTitle = `New ${activeItem.title} Chat`;
+    const chatId = await createChat({
+      title: chatTitle,
+      agentId: activeItem.agentId || 'all',
+      agentType: activeItem.agentType || 'general',
+    });
+
+    // Select the new chat
+    const newChat: ChatThread = {
+      id: chatId,
+      title: chatTitle,
+      lastMessage: '',
+      timestamp: 'Just now',
+      agentType: activeItem.agentType || 'general',
+      messageCount: 0,
+    };
+    setSelectedThread(newChat);
+    onThreadSelect?.(newChat);
+  };
+
+  // Build nav items from agents
+  const allNavItems = React.useMemo(() => {
+    const defaultItems = [
+      {
+        title: 'All Chats',
+        url: '#',
+        icon: MessageSquare,
+        isActive: false,
+        agentId: undefined,
+        agentType: 'all',
+        avatarUrl: undefined,
+      },
+    ];
+
+    const agentItems = agents.map((agent) => ({
+      title: agent.name,
+      url: '#',
+      icon: ICON_MAP[agent.icon] || Bot,
+      isActive: false,
+      isCustom: agent.isCustom,
+      agentId: agent.id,
+      agentType: agent.agentType,
+      color: agent.color,
+      avatarUrl: agent.avatarUrl,
+    }));
+
+    return [...defaultItems, ...agentItems];
+  }, [agents]);
+
+  // Convert DB chats to ChatThread format
+  const threads = React.useMemo(() => {
+    return chats.map((chat) => ({
+      id: chat.id,
+      title: chat.title,
+      lastMessage: chat.lastMessage || '',
+      timestamp: formatTimestamp(chat.updatedAt),
+      agentType: chat.agentType,
+      messageCount: chat.messageCount,
+    }));
+  }, [chats]);
+
+  function formatTimestamp(timestamp: number): string {
+    const now = Date.now();
+    const diff = now - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes} min ago`;
+    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+    return new Date(timestamp).toLocaleDateString();
+  }
 
   return (
     <Sidebar
@@ -168,7 +327,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         collapsible="none"
         className="w-[calc(var(--sidebar-width-icon)+1px)]! border-r"
       >
-        <SidebarHeader>
+        {/* <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
@@ -184,12 +343,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarHeader>
+        </SidebarHeader> */}
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent className="px-1.5 md:px-0">
               <SidebarMenu>
-                {data.navMain.map((item) => (
+                {allNavItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       tooltip={{
@@ -197,33 +356,67 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         hidden: false,
                       }}
                       onClick={() => {
-                        setActiveItem(item)
-                        if (isClient) {
-                          const mail = [...data.mails].sort(() => Math.random() - 0.5)
-                          setMails(
-                            mail.slice(
-                              0,
-                              Math.max(5, Math.floor(Math.random() * 10) + 1)
-                            )
-                          )
+                        setActiveItem(item);
+                        onAgentSelect?.(item);
+                        
+                        // Auto-select the newest chat for this agent
+                        const agentChats = chats.filter(chat => chat.agentId === item.agentId);
+                        if (agentChats.length > 0) {
+                          // Sort by timestamp/createdAt and select newest
+                          const sortedChats = agentChats.sort((a, b) => b.createdAt - a.createdAt);
+                          const newestChat = sortedChats[0];
+                          if (newestChat) {
+                            setSelectedThread({
+                              id: newestChat.id,
+                              title: newestChat.title || 'Untitled Chat',
+                              agentType: item.agentType,
+                              lastMessage: newestChat.lastMessage || '',
+                              timestamp: new Date(newestChat.createdAt).toLocaleDateString(),
+                              messageCount: newestChat.messageCount || 0,
+                            });
+                            onThreadSelect?.(newestChat as any);
+                          }
+                        } else {
+                          setSelectedThread(null);
                         }
-                        setOpen(true)
+                        setOpen(true);
                       }}
                       isActive={activeItem?.title === item.title}
                       className="px-2.5 md:px-2"
                     >
-                      <item.icon />
+                      {item.avatarUrl ? (
+                        <AvatarWithFile
+                          fileId={item.avatarUrl}
+                          fallbackIcon={item.icon}
+                        />
+                      ) : (
+                        <item.icon />
+                      )}
                       <span>{item.title}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
+                {/* Add Agent Button */}
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    tooltip={{
+                      children: 'Create Custom Agent',
+                      hidden: false,
+                    }}
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="px-2.5 md:px-2 border-t mt-2 pt-2"
+                  >
+                    <Plus className="w-5 h-5" />
+                    <span>New Agent</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter>
+        {/* <SidebarFooter>
           <NavUser user={data.user} />
-        </SidebarFooter>
+        </SidebarFooter> */}
       </Sidebar>
 
       {/* This is the second sidebar */}
@@ -234,36 +427,63 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div className="text-foreground text-base font-medium">
               {activeItem?.title}
             </div>
-            <Label className="flex items-center gap-2 text-sm">
-              <span>Unreads</span>
-              <Switch className="shadow-none" />
-            </Label>
+            <button
+              onClick={handleNewChat}
+              className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
+              title="New Chat"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New</span>
+            </button>
           </div>
-          <SidebarInput placeholder="Type to search..." />
+          <div className="text-xs text-muted-foreground">
+            {threads.length} {threads.length === 1 ? 'chat' : 'chats'}
+          </div>
+          <SidebarInput placeholder="Search chats..." />
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="px-0">
             <SidebarGroupContent>
-              {mails.map((mail) => (
-                <a
-                  href="#"
-                  key={mail.email}
-                  className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0"
+              {threads.map((thread) => (
+                <button
+                  key={thread.id}
+                  onClick={() => {
+                    setSelectedThread(thread);
+                    onThreadSelect?.(thread);
+                  }}
+                  className={`hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0 w-full text-left transition-colors ${
+                    selectedThread?.id === thread.id ? 'bg-sidebar-accent' : ''
+                  }`}
                 >
                   <div className="flex w-full items-center gap-2">
-                    <span>{mail.name}</span>{" "}
-                    <span className="ml-auto text-xs">{mail.date}</span>
+                    <span className="font-medium">{thread.title}</span>
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {thread.timestamp}
+                    </span>
                   </div>
-                  <span className="font-medium">{mail.subject}</span>
-                  <span className="line-clamp-2 w-[260px] text-xs whitespace-break-spaces">
-                    {mail.teaser}
+                  <span className="line-clamp-1 w-[260px] text-xs text-muted-foreground">
+                    {thread.lastMessage}
                   </span>
-                </a>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize">
+                      {thread.agentType}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {thread.messageCount} messages
+                    </span>
+                  </div>
+                </button>
               ))}
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
+
+      <CreateAgentModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onCreateAgent={handleCreateAgent}
+      />
     </Sidebar>
-  )
+  );
 }

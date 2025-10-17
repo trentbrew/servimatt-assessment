@@ -14,15 +14,19 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@instantdb/admin": "^0.22.21",
     "@instantdb/react": "^0.22.20",
     "@openai/agents": "^0.1.9",
+    "@tailwindcss/typography": "^0.5.19",
     "@workspace/agent-core": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "dotenv": "^17.2.3",
     "lucide-react": "^0.475.0",
     "next": "^15.4.5",
     "next-themes": "^0.4.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
     "zod": "3",
     "zustand": "^5.0.8"
   },
