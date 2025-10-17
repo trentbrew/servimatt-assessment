@@ -6,7 +6,7 @@
 
 A production-ready AI chat application with multi-agent orchestration and RAG for document analysis.
 
-**Live Demo:** [servimatt.brew.build](https://servimatt.brew.build)
+**Live Demo:** [servimatt-assessment-web.vercel.app](https://servimatt-assessment-web.vercel.app/dashboard)
 
 ## Features
 
