@@ -494,7 +494,7 @@ export function AppSidebar({
               {threads.map((thread) => (
                 <div
                   key={thread.id}
-                  className={`group relative hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0 w-full transition-colors ${
+                  className={`group relative hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight last:border-b-0 w-full max-w-full transition-colors overflow-hidden ${
                     selectedThread?.id === thread.id ? 'bg-sidebar-accent' : ''
                   }`}
                 >
@@ -505,9 +505,9 @@ export function AppSidebar({
                         onThreadSelect?.(thread);
                       }
                     }}
-                    className="w-full cursor-pointer"
+                    className="w-full cursor-pointer min-w-0"
                   >
-                    <div className="flex w-full items-center gap-2">
+                    <div className="flex w-full items-center gap-2 min-w-0">
                       {editingThreadId === thread.id ? (
                         <input
                           type="text"
@@ -534,15 +534,15 @@ export function AppSidebar({
                             }
                           }}
                           autoFocus
-                          className="font-medium bg-transparent border-none outline-none focus:outline-none flex-1 text-foreground"
+                          className="font-medium bg-transparent border-none outline-none focus:outline-none flex-1 min-w-0 text-foreground"
                           onClick={(e) => e.stopPropagation()}
                         />
                       ) : (
-                        <span className="font-medium flex-1">
+                        <span className="font-medium flex-1 truncate min-w-0">
                           {thread.title}
                         </span>
                       )}
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -572,7 +572,7 @@ export function AppSidebar({
                         {thread.timestamp}
                       </span>
                     </div>
-                    <span className="line-clamp-1 w-[260px] text-xs text-muted-foreground mt-1">
+                    <span className="line-clamp-1 text-xs text-muted-foreground mt-1 w-full overflow-hidden">
                       {thread.lastMessage}
                     </span>
                     <div className="flex items-center gap-2 mt-1">
