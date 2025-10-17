@@ -488,15 +488,16 @@ export function AppSidebar({
           </div>
           <SidebarInput placeholder="Search chats..." />
         </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup className="px-0">
-            <SidebarGroupContent>
+        <SidebarContent className="overflow-x-hidden">
+          <SidebarGroup className="px-0 w-full">
+            <SidebarGroupContent className="w-full">
               {threads.map((thread) => (
                 <div
                   key={thread.id}
-                  className={`group relative hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight last:border-b-0 w-full max-w-full transition-colors overflow-hidden ${
+                  className={`group relative hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight last:border-b-0 transition-colors ${
                     selectedThread?.id === thread.id ? 'bg-sidebar-accent' : ''
                   }`}
+                  style={{ maxWidth: '100%', overflow: 'hidden' }}
                 >
                   <div
                     onClick={() => {
@@ -572,14 +573,16 @@ export function AppSidebar({
                         {thread.timestamp}
                       </span>
                     </div>
-                    <span className="line-clamp-1 text-xs text-muted-foreground mt-1 w-full overflow-hidden">
-                      {thread.lastMessage}
-                    </span>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize">
+                    <div className="w-full overflow-hidden">
+                      <span className="block truncate text-xs text-muted-foreground mt-1">
+                        {thread.lastMessage}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 w-full overflow-hidden min-w-0">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize shrink-0 max-w-[120px] truncate">
                         {thread.agentType}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground truncate min-w-0">
                         {thread.messageCount} messages
                       </span>
                     </div>
