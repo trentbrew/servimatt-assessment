@@ -305,6 +305,7 @@ export function AppSidebar({
   // Convert DB chats to ChatThread format
   const threads = React.useMemo(() => {
     return chats
+      .filter((chat) => chat.messageCount > 0) // Hide empty chats
       .sort((a, b) => b.updatedAt - a.updatedAt) // Sort newest first
       .map((chat) => ({
         id: chat.id,
