@@ -130,9 +130,11 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
   
   // Sidebar state - safely handle SSR
   let sidebarState: 'expanded' | 'collapsed' = 'expanded';
+  let isMobile = false;
   try {
     const sidebar = useSidebar();
     sidebarState = sidebar.state;
+    isMobile = sidebar.isMobile;
   } catch {
     // SidebarProvider not available during SSR/prerendering
   }
@@ -500,9 +502,9 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
 
         <form
           onSubmit={handleSubmit}
-          className="fixed bottom-0 left-0 right-0 p-3 md:p-4 bg-background/75 backdrop-blur-sm border-t transition-[left]"
+          className="fixed bottom-0 p-3 md:p-4 bg-background/75 backdrop-blur-sm border-t transition-[left]"
           style={{
-            left: sidebarState === 'expanded' ? 'var(--sidebar-width)' : '3rem',
+            left: isMobile ? 0 : (sidebarState === 'expanded' ? 'var(--sidebar-width)' : '3rem'),
             right: 0,
           }}
         >
