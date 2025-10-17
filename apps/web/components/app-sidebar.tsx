@@ -305,7 +305,11 @@ export function AppSidebar({
   // Convert DB chats to ChatThread format
   const threads = React.useMemo(() => {
     return chats
-      .filter((chat) => chat.messageCount > 0) // Hide empty chats
+      .filter((chat) => {
+        // Always show selected chat, hide other empty chats
+        if (chat.id === selectedThread?.id) return true;
+        return chat.messageCount > 0;
+      })
       .sort((a, b) => b.updatedAt - a.updatedAt) // Sort newest first
       .map((chat) => ({
         id: chat.id,
@@ -315,7 +319,7 @@ export function AppSidebar({
         agentType: chat.agentType,
         messageCount: chat.messageCount,
       }));
-  }, [chats]);
+  }, [chats, selectedThread?.id]);
 
   function formatTimestamp(timestamp: number): string {
     const now = Date.now();
