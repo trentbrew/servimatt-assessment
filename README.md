@@ -8,11 +8,11 @@ A production-ready AI chat application with multi-agent orchestration and RAG fo
 
 ## Features
 
-- 🤖 Multi-agent system with OpenAI Agents SDK
-- 📄 RAG implementation (CSV, JSON, MD, XLSX, TXT)
-- ⚡ Real-time sync with InstantDB
-- 🎨 Modern UI with shadcn/ui
-- 🚀 Deployed on Vercel
+- Multi-agent system with OpenAI Agents SDK
+- RAG implementation (CSV, JSON, MD, XLSX, TXT)
+- Real-time sync with InstantDB
+- Modern UI with shadcn/ui
+- Deployed on Vercel
 
 ## Quick Start
 

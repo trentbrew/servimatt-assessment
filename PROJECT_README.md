@@ -2,12 +2,12 @@
 
 A production-ready, real-time AI chat application featuring multi-agent orchestration and Retrieval-Augmented Generation (RAG) for document querying.
 
-**Live Demo:** [servimatt.brew.build](https://servimatt.brew.build)
+**Live Demo:** [servimatt.brew.build](https://servimatt.brew.build)  
 **Repository:** [github.com/trentbrew/servimatt-assessment](https://github.com/trentbrew/servimatt-assessment)
 
 ---
 
-## 🎯 Overview
+## Overview
 
 This application demonstrates modern AI application development with:
 
@@ -21,30 +21,30 @@ Built with Next.js 15, React 19, TypeScript, and shadcn/ui components.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🤖 Multi-Agent Intelligence
+### Multi-Agent Intelligence
 
 - **Triage routing** automatically directs queries to specialized agents
 - **Built-in tutors** for math and history with custom tools
 - **Custom agents** with configurable personalities, expertise, and avatars
 - **Agent-specific chats** with isolated conversation histories
 
-### 📄 RAG Document Analysis
+### RAG Document Analysis
 
 - Upload and analyze multiple file types: CSV, JSON, Markdown, XLSX, TXT
 - Server-side file parsing with content extraction
 - Context-enhanced AI responses based on document contents
 - Support for files up to 10MB with validation and retry logic
 
-### ⚡ Real-Time Capabilities
+### Real-Time Capabilities
 
 - **InstantDB integration** for live data synchronization
 - **Streaming responses** with Server-Sent Events (SSE)
 - **File storage** with secure upload/retrieval
 - **Persistent chat history** across sessions
 
-### 🎨 Modern UI/UX
+### Modern UI/UX
 
 - Clean, accessible chat interface with markdown rendering
 - Dark/light mode support
@@ -54,7 +54,7 @@ Built with Next.js 15, React 19, TypeScript, and shadcn/ui components.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### Monorepo Structure
 
@@ -86,7 +86,7 @@ app-v1/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -145,7 +145,7 @@ app-v1/
 
 ---
 
-## 📚 Usage
+## Usage
 
 ### Creating a Custom Agent
 
@@ -174,7 +174,7 @@ app-v1/
 
 ---
 
-## 🎓 Technical Highlights
+## Technical Highlights
 
 ### OpenAI Agents SDK Integration
 
@@ -212,7 +212,7 @@ User Action → API Route → InstantDB → Real-time Update → UI Re-render
 
 ---
 
-## 📖 API Routes
+## API Routes
 
 ### `POST /api/agent`
 
@@ -237,7 +237,7 @@ Upload agent avatar image
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Test File Upload
 
@@ -259,7 +259,7 @@ bash test-api.sh
 
 ---
 
-## 🚢 Deployment
+## Deployment
 
 The application is deployed on Vercel with automatic deployments from the `main` branch.
 
@@ -277,7 +277,7 @@ See [`.notes/DEPLOYMENT.md`](.notes/DEPLOYMENT.md) for detailed deployment instr
 
 ---
 
-## 📁 Key Files
+## Key Files
 
 | File                                | Description                   |
 | ----------------------------------- | ----------------------------- |
@@ -290,7 +290,7 @@ See [`.notes/DEPLOYMENT.md`](.notes/DEPLOYMENT.md) for detailed deployment instr
 
 ---
 
-## 🤔 Design Decisions
+## Design Decisions
 
 ### Why InstantDB?
 
@@ -322,7 +322,7 @@ See [`.notes/DEPLOYMENT.md`](.notes/DEPLOYMENT.md) for detailed deployment instr
 
 ---
 
-## 🛠️ Future Enhancements
+## Future Enhancements
 
 - [ ] Full XLSX parsing with `xlsx` library
 - [ ] User authentication and multi-tenancy
@@ -336,13 +336,13 @@ See [`.notes/DEPLOYMENT.md`](.notes/DEPLOYMENT.md) for detailed deployment instr
 
 ---
 
-## 📝 License
+## License
 
 MIT License - feel free to use this as a starting point for your own projects!
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 Built with:
 

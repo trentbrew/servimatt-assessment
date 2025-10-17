@@ -127,10 +127,15 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
   const [toolStatus, setToolStatus] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { state, open, isMobile, toggleSidebar } = useSidebar();
-
-  // Sidebar state
-  const isCollapsed = state === 'collapsed';
+  
+  // Sidebar state - safely handle SSR
+  let sidebarState: 'expanded' | 'collapsed' = 'expanded';
+  try {
+    const sidebar = useSidebar();
+    sidebarState = sidebar.state;
+  } catch {
+    // SidebarProvider not available during SSR/prerendering
+  }
 
   // Get messages from InstantDB
   const { messages: dbMessages, addMessage } = useMessages(chatId);
@@ -497,7 +502,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
           onSubmit={handleSubmit}
           className="fixed bottom-0 left-0 right-0 p-3 md:p-4 bg-background/75 backdrop-blur-sm border-t transition-[left]"
           style={{
-            left: state === 'expanded' ? 'var(--sidebar-width)' : '3rem',
+            left: sidebarState === 'expanded' ? 'var(--sidebar-width)' : '3rem',
             right: 0,
           }}
         >
