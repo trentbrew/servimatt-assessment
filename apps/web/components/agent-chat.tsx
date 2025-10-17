@@ -380,9 +380,34 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
 
           {chatId && messages.length === 0 && currentAgent && (
             <div className="flex flex-col items-center justify-center h-full text-center px-4">
-              {/* Agent Avatar */}
-              <div className="mb-4 w-16 h-16">
-                <AgentAvatar agent={currentAgent} />
+              {/* Agent Avatar - Large */}
+              <div className="mb-6">
+                {currentAgent.avatarUrl ? (
+                  <Avatar className="w-20 h-20">
+                    <AvatarImage
+                      src={currentAgent.avatarUrl}
+                      alt="Agent avatar"
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="bg-primary/10">
+                      {ICON_MAP[currentAgent.icon] ? (
+                        React.createElement(ICON_MAP[currentAgent.icon], { className: 'w-10 h-10' })
+                      ) : (
+                        <Bot className="w-10 h-10" />
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Avatar className="w-20 h-20">
+                    <AvatarFallback className="bg-primary/10">
+                      {ICON_MAP[currentAgent.icon] ? (
+                        React.createElement(ICON_MAP[currentAgent.icon], { className: 'w-10 h-10' })
+                      ) : (
+                        <Bot className="w-10 h-10" />
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
               </div>
 
               {/* Agent Info */}
