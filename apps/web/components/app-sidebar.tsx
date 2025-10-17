@@ -304,14 +304,16 @@ export function AppSidebar({
 
   // Convert DB chats to ChatThread format
   const threads = React.useMemo(() => {
-    return chats.map((chat) => ({
-      id: chat.id,
-      title: chat.title,
-      lastMessage: chat.lastMessage || '',
-      timestamp: formatTimestamp(chat.updatedAt),
-      agentType: chat.agentType,
-      messageCount: chat.messageCount,
-    }));
+    return chats
+      .sort((a, b) => b.updatedAt - a.updatedAt) // Sort newest first
+      .map((chat) => ({
+        id: chat.id,
+        title: chat.title,
+        lastMessage: chat.lastMessage || '',
+        timestamp: formatTimestamp(chat.updatedAt),
+        agentType: chat.agentType,
+        messageCount: chat.messageCount,
+      }));
   }, [chats]);
 
   function formatTimestamp(timestamp: number): string {
@@ -321,11 +323,14 @@ export function AppSidebar({
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes} min ago`;
-    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
-    return new Date(timestamp).toLocaleDateString();
+    if (minutes < 1) return 'now';
+    if (minutes < 60) return `${minutes}m`;
+    if (hours < 24) return `${hours}h`;
+    if (days < 7) return `${days}d`;
+    return new Date(timestamp).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    });
   }
 
   return (
@@ -563,7 +568,7 @@ export function AppSidebar({
                           <Trash2 className="w-3 h-3" />
                         </button>
                       </div>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground shrink-0 ml-2">
                         {thread.timestamp}
                       </span>
                     </div>
