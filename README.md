@@ -1,5 +1,7 @@
 # AI Multi-Agent Chat with RAG
 
+<img width="1538" height="989" alt="image" src="https://github.com/user-attachments/assets/dd40e00c-afc4-49e3-ad5d-fec93de79691" />
+
 > **📖 For full documentation, see [PROJECT_README.md](./PROJECT_README.md)**
 
 A production-ready AI chat application with multi-agent orchestration and RAG for document analysis.
