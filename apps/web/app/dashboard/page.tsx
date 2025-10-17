@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { AppSidebar, ChatThread } from '@/components/app-sidebar';
-import { AgentChat } from '@/components/AgentChat';
+import { AgentChat } from '@/components/agent-chat';
 import {
   Breadcrumb,
   BreadcrumbItem,

@@ -41,6 +41,7 @@ export interface CustomAgent {
   systemPrompt: string;
   color: string;
   avatarUrl?: string;
+  starterPrompts?: string[];
 }
 
 interface CreateAgentModalProps {
@@ -81,6 +82,7 @@ export function CreateAgentModal({
   const [avatarFile, setAvatarFile] = React.useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
   const [isUploading, setIsUploading] = React.useState(false);
+  const [starterPrompts, setStarterPrompts] = React.useState<string[]>(['', '', '']);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,6 +153,7 @@ export function CreateAgentModal({
         systemPrompt: systemPrompt.trim(),
         color,
         avatarUrl,
+        starterPrompts: starterPrompts.filter(p => p.trim()).map(p => p.trim()),
       };
 
       onCreateAgent(newAgent);
@@ -164,6 +167,7 @@ export function CreateAgentModal({
       setColor('blue');
       setAvatarFile(null);
       setAvatarPreview(null);
+      setStarterPrompts(['', '', '']);
       
       onOpenChange(false);
     } catch (error) {
@@ -333,7 +337,27 @@ export function CreateAgentModal({
               </p>
             </div>
 
-            {/* Preview */}
+            {/* Starter Prompts */}
+            <div className="space-y-2">
+              <Label>Starter Prompts (Optional)</Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Suggest conversation starters for users (up to 3)
+              </p>
+              {starterPrompts.map((prompt, index) => (
+                <Input
+                  key={index}
+                  placeholder={`e.g., ${index === 0 ? 'Explain photosynthesis simply' : index === 1 ? 'What are the main types of cells?' : 'Help me with cellular respiration'}`}
+                  value={prompt}
+                  onChange={(e) => {
+                    const newPrompts = [...starterPrompts];
+                    newPrompts[index] = e.target.value;
+                    setStarterPrompts(newPrompts);
+                  }}
+                  className="mb-2"
+                />
+              ))}
+            </div>
+
             {/* Preview */}
             <div className="space-y-2">
               <Label>Preview</Label>

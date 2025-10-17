@@ -12,6 +12,12 @@ const DEFAULT_AGENTS = [
     color: 'blue',
     isCustom: false,
     avatarUrl: undefined,
+    personality: 'Patient and encouraging, breaks down complex problems step-by-step',
+    starterPrompts: [
+      'What is 25 × 17?',
+      'Help me solve this quadratic equation',
+      'Explain the Pythagorean theorem'
+    ],
   },
   {
     id: 'agent-history',
@@ -22,6 +28,12 @@ const DEFAULT_AGENTS = [
     color: 'purple',
     isCustom: false,
     avatarUrl: undefined,
+    personality: 'Engaging storyteller, makes historical events come alive',
+    starterPrompts: [
+      'When did sharks first appear?',
+      'Tell me about the Renaissance',
+      'What caused World War I?'
+    ],
   },
 ];
 

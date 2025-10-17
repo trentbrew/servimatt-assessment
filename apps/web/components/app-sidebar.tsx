@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 import { NavUser } from '@/components/nav-user';
-import { CreateAgentModal, CustomAgent } from '@/components/CreateAgentModal';
+import { CreateAgentModal, CustomAgent } from '@/components/create-agent-modal';
 import { useAgents, useChats } from '@/hooks/useAgents';
 import { db } from '@/lib/instant';
 import { Label } from '@workspace/ui/components/label';
@@ -84,7 +84,13 @@ function AvatarWithFile({
 
   return (
     <Avatar className="w-5 h-5">
-      {fileUrl && <AvatarImage src={fileUrl} alt="Agent avatar" className="object-cover" />}
+      {fileUrl && (
+        <AvatarImage
+          src={fileUrl}
+          alt="Agent avatar"
+          className="object-cover"
+        />
+      )}
       <AvatarFallback className="w-5 h-5">
         <FallbackIcon className="w-3 h-3" />
       </AvatarFallback>
@@ -208,13 +214,17 @@ export function AppSidebar({
     null,
   );
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
-  const [editingThreadId, setEditingThreadId] = React.useState<string | null>(null);
+  const [editingThreadId, setEditingThreadId] = React.useState<string | null>(
+    null,
+  );
   const [editingTitle, setEditingTitle] = React.useState('');
   const { setOpen } = useSidebar();
 
   // Get agents and chats from InstantDB
   const { agents, createAgent: createAgentInDB } = useAgents();
-  const { chats, createChat, updateChat, deleteChat } = useChats(activeItem?.agentId);
+  const { chats, createChat, updateChat, deleteChat } = useChats(
+    activeItem?.agentId,
+  );
 
   // Set initial active item
   React.useEffect(() => {
@@ -362,12 +372,16 @@ export function AppSidebar({
                       onClick={async () => {
                         setActiveItem(item);
                         onAgentSelect?.(item);
-                        
+
                         // Auto-select the newest chat for this agent OR create one if none exist
-                        const agentChats = chats.filter(chat => chat.agentId === item.agentId);
+                        const agentChats = chats.filter(
+                          (chat) => chat.agentId === item.agentId,
+                        );
                         if (agentChats.length > 0) {
                           // Sort by timestamp/createdAt and select newest
-                          const sortedChats = agentChats.sort((a, b) => b.createdAt - a.createdAt);
+                          const sortedChats = agentChats.sort(
+                            (a, b) => b.createdAt - a.createdAt,
+                          );
                           const newestChat = sortedChats[0];
                           if (newestChat) {
                             setSelectedThread({
@@ -375,7 +389,9 @@ export function AppSidebar({
                               title: newestChat.title || 'Untitled Chat',
                               agentType: item.agentType,
                               lastMessage: newestChat.lastMessage || '',
-                              timestamp: new Date(newestChat.createdAt).toLocaleDateString(),
+                              timestamp: new Date(
+                                newestChat.createdAt,
+                              ).toLocaleDateString(),
                               messageCount: newestChat.messageCount || 0,
                             });
                             onThreadSelect?.(newestChat as any);
@@ -388,7 +404,7 @@ export function AppSidebar({
                               title: `New ${item.title} Chat`,
                               agentType: item.agentType,
                             });
-                            
+
                             const newThread = {
                               id: newChatId,
                               title: `New ${item.title} Chat`,
@@ -397,7 +413,7 @@ export function AppSidebar({
                               timestamp: 'Just now',
                               messageCount: 0,
                             };
-                            
+
                             setSelectedThread(newThread);
                             onThreadSelect?.(newThread);
                           } else {
@@ -494,14 +510,18 @@ export function AppSidebar({
                           onChange={(e) => setEditingTitle(e.target.value)}
                           onBlur={async () => {
                             if (editingTitle.trim()) {
-                              await updateChat(thread.id, { title: editingTitle.trim() });
+                              await updateChat(thread.id, {
+                                title: editingTitle.trim(),
+                              });
                             }
                             setEditingThreadId(null);
                           }}
                           onKeyDown={async (e) => {
                             if (e.key === 'Enter') {
                               if (editingTitle.trim()) {
-                                await updateChat(thread.id, { title: editingTitle.trim() });
+                                await updateChat(thread.id, {
+                                  title: editingTitle.trim(),
+                                });
                               }
                               setEditingThreadId(null);
                             } else if (e.key === 'Escape') {
@@ -513,7 +533,9 @@ export function AppSidebar({
                           onClick={(e) => e.stopPropagation()}
                         />
                       ) : (
-                        <span className="font-medium flex-1">{thread.title}</span>
+                        <span className="font-medium flex-1">
+                          {thread.title}
+                        </span>
                       )}
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button

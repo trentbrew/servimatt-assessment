@@ -378,16 +378,46 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
             </div>
           )}
 
-          {chatId && messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-              <Bot className="w-12 h-12 mb-4 opacity-50" />
-              <p className="text-sm mb-2">Start a conversation!</p>
-              <div className="space-y-1 text-xs">
-                <p className="italic">
-                  &quot;When did sharks first appear?&quot;
-                </p>
-                <p className="italic">&quot;What is 25 × 17?&quot;</p>
+          {chatId && messages.length === 0 && currentAgent && (
+            <div className="flex flex-col items-center justify-center h-full text-center px-4">
+              {/* Agent Avatar */}
+              <div className="mb-4 w-16 h-16">
+                <AgentAvatar agent={currentAgent} />
               </div>
+
+              {/* Agent Info */}
+              <h2 className="text-xl font-semibold mb-2">
+                {currentAgent.title || currentAgent.name}
+              </h2>
+              <p className="text-sm text-muted-foreground mb-1">
+                {currentAgent.expertise}
+              </p>
+              {currentAgent.personality && (
+                <p className="text-xs text-muted-foreground mb-6 max-w-md">
+                  {currentAgent.personality}
+                </p>
+              )}
+
+              {/* Starter Prompts */}
+              {currentAgent.starterPrompts && currentAgent.starterPrompts.length > 0 && (
+                <div className="space-y-2 w-full max-w-md">
+                  <p className="text-sm font-medium mb-3">Start a conversation:</p>
+                  {currentAgent.starterPrompts.map((prompt: string, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setInput(prompt);
+                        // Optionally auto-submit
+                        // handleSubmit(new Event('submit') as any);
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg border border-border bg-muted/30 hover:bg-muted hover:border-primary/50 transition-all text-sm"
+                    >
+                      <span className="text-muted-foreground mr-2">→</span>
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           <div className="space-y-4">
