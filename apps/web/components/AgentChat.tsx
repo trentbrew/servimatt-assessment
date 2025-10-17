@@ -495,7 +495,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
 
         <form
           onSubmit={handleSubmit}
-          className="fixed bottom-0 p-4 bg-background/75 backdrop-blur-sm border-t transition-[left]"
+          className="fixed bottom-0 left-0 right-0 p-3 md:p-4 bg-background/75 backdrop-blur-sm border-t transition-[left]"
           style={{
             left: state === 'expanded' ? 'var(--sidebar-width)' : '3rem',
             right: 0,
@@ -503,18 +503,20 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
         >
           {/* File Attachments */}
           {attachedFiles.length > 0 && (
-            <div className="mb-3 flex flex-wrap gap-2">
+            <div className="mb-2 md:mb-3 flex flex-wrap gap-1.5 md:gap-2">
               {attachedFiles.map((file) => (
                 <div
                   key={file.id}
-                  className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 text-sm"
+                  className="flex items-center gap-1.5 md:gap-2 bg-muted rounded-lg px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm"
                 >
-                  <FileText className="w-4 h-4" />
-                  <span className="truncate max-w-32">{file.name}</span>
+                  <FileText className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                  <span className="truncate max-w-20 md:max-w-32">
+                    {file.name}
+                  </span>
                   <button
                     type="button"
                     onClick={() => removeAttachment(file.id)}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground flex-shrink-0"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -523,7 +525,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
             </div>
           )}
 
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 md:gap-2">
             <Button
               type="button"
               variant="outline"
@@ -531,8 +533,9 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading || isUploading}
               title="Attach files (CSV, JSON, Markdown, XLSX)"
+              className="h-9 w-9 md:h-10 md:w-10 flex-shrink-0"
             >
-              <Paperclip className="w-4 h-4" />
+              <Paperclip className="w-3.5 h-3.5 md:w-4 md:h-4" />
             </Button>
 
             <Input
@@ -545,7 +548,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                   : 'Ask a question...'
               }
               disabled={isLoading}
-              className="flex-1"
+              className="flex-1 h-9 md:h-10 text-sm md:text-base"
             />
 
             <Button
@@ -554,8 +557,9 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                 isLoading || (!input.trim() && attachedFiles.length === 0)
               }
               size="icon"
+              className="h-9 w-9 md:h-10 md:w-10 flex-shrink-0"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3.5 h-3.5 md:w-4 md:h-4" />
             </Button>
           </div>
 

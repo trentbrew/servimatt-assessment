@@ -40,7 +40,7 @@ export function useAgents() {
   }) => {
     const agentId = id();
     await db.transact(
-      db.tx.agents[agentId].update({
+      db.tx.agents![agentId].update({
         ...agentData,
         isCustom: true,
         createdAt: Date.now(),
@@ -50,7 +50,7 @@ export function useAgents() {
   };
 
   const deleteAgent = async (agentId: string) => {
-    await db.transact(db.tx.agents[agentId].delete());
+    await db.transact(db.tx.agents![agentId].delete());
   };
 
   // Combine default agents with custom agents from DB
@@ -80,7 +80,7 @@ export function useChats(agentId?: string) {
   }) => {
     const chatId = id();
     await db.transact(
-      db.tx.chats[chatId].update({
+      db.tx.chats![chatId].update({
         ...chatData,
         messageCount: 0,
         createdAt: Date.now(),
@@ -99,7 +99,7 @@ export function useChats(agentId?: string) {
     }
   ) => {
     await db.transact(
-      db.tx.chats[chatId].update({
+      db.tx.chats![chatId].update({
         ...updates,
         updatedAt: Date.now(),
       })
@@ -108,7 +108,7 @@ export function useChats(agentId?: string) {
 
   const deleteChat = async (chatId: string) => {
     // Just delete the chat - messages will be handled separately
-    await db.transact(db.tx.chats[chatId].delete());
+    await db.transact(db.tx.chats![chatId].delete());
   };
 
   // Filter chats by agentId if provided
@@ -141,7 +141,7 @@ export function useMessages(chatId?: string) {
   }) => {
     const messageId = id();
     await db.transact(
-      db.tx.messages[messageId].update({
+      db.tx.messages![messageId].update({
         ...messageData,
         createdAt: Date.now(),
       })
