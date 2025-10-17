@@ -14,6 +14,8 @@ import {
   Calculator,
   Palette,
 } from 'lucide-react';
+import { useSidebar } from '@workspace/ui/components/sidebar';
+
 import { db } from '@/lib/instant';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@workspace/ui/components/button';
@@ -125,6 +127,10 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
   const [toolStatus, setToolStatus] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { state, open, isMobile, toggleSidebar } = useSidebar();
+
+  // Sidebar state
+  const isCollapsed = state === 'collapsed';
 
   // Get messages from InstantDB
   const { messages: dbMessages, addMessage } = useMessages(chatId);
@@ -175,22 +181,23 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
       }
 
       const uploadResult = await uploadResponse.json();
-      
+
       // Handle partial successes
       if (uploadResult.files && uploadResult.files.length > 0) {
         setAttachedFiles((prev) => [...prev, ...uploadResult.files]);
       }
-      
+
       // Show warnings for any errors
       if (uploadResult.errors && uploadResult.errors.length > 0) {
         console.warn('Some files failed to upload:', uploadResult.errors);
         alert(
-          `Some files failed:\n${uploadResult.errors.join('\n')}\n\n${uploadResult.files?.length || 0} files uploaded successfully.`
+          `Some files failed:\n${uploadResult.errors.join('\n')}\n\n${uploadResult.files?.length || 0} files uploaded successfully.`,
         );
       }
     } catch (error) {
       console.error('File upload error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       alert(
         `Upload failed: ${errorMessage}\n\nPlease try again or contact support if the issue persists.`,
       );
@@ -221,7 +228,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
 
     try {
       setIsLoading(true);
-      
+
       // Show tool status if files are attached
       if (messageAttachments.length > 0) {
         setToolStatus('Analyzing files...');
@@ -285,7 +292,10 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                   const toolName = data.toolCall.name || 'tool';
                   if (toolName.includes('file') || toolName.includes('read')) {
                     setToolStatus('Reading files...');
-                  } else if (toolName.includes('search') || toolName.includes('query')) {
+                  } else if (
+                    toolName.includes('search') ||
+                    toolName.includes('query')
+                  ) {
                     setToolStatus('Searching...');
                   } else if (toolName.includes('analyze')) {
                     setToolStatus('Analyzing...');
@@ -447,11 +457,22 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                 <AgentAvatar agent={currentAgent} />
                 <div className="bg-muted/50 rounded-lg px-4 py-2 flex items-center gap-2">
                   <div className="flex gap-1">
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+                      style={{ animationDelay: '0ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+                      style={{ animationDelay: '150ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+                      style={{ animationDelay: '300ms' }}
+                    ></div>
                   </div>
-                  <span className="text-xs text-muted-foreground font-medium">{toolStatus}</span>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {toolStatus}
+                  </span>
                 </div>
               </div>
             )}
@@ -474,7 +495,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
 
         <form
           onSubmit={handleSubmit}
-          className="absolute bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t"
+          className={`fixed bottom-0 p-4 bg-background/95 backdrop-blur-sm border-t w-xl ${!isCollapsed ? 'ml-12' : ''}`}
         >
           {/* File Attachments */}
           {attachedFiles.length > 0 && (
