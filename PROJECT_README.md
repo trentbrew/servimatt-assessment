@@ -2,7 +2,7 @@
 
 A production-ready, real-time AI chat application featuring multi-agent orchestration and Retrieval-Augmented Generation (RAG) for document querying.
 
-**Live Demo:** [servimatt.brew.build](https://servimatt.brew.build)  
+**Live Demo:** [servimatt-assessment-web.vercel.app](https://servimatt-assessment-web.vercel.app/)  
 **Repository:** [github.com/trentbrew/servimatt-assessment](https://github.com/trentbrew/servimatt-assessment)
 
 ---
