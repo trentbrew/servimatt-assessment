@@ -269,8 +269,15 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get response');
+        let errorMessage = 'Failed to get response';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch (parseError) {
+          // If response is not JSON (e.g., HTML error page), use status text
+          errorMessage = `Server error (${response.status}): ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
       // Handle streaming response

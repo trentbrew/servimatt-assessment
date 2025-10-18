@@ -22,10 +22,14 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 20 requests per hour per IP
     const clientIp = getClientIp(request);
+    console.log('Request from IP:', clientIp);
+    
     const rateLimitResult = rateLimit(clientIp, {
       limit: 20,
       window: 60 * 60 * 1000, // 1 hour
     });
+    
+    console.log('Rate limit result:', rateLimitResult);
 
     if (!rateLimitResult.success) {
       const resetDate = new Date(rateLimitResult.resetAt);
@@ -47,7 +51,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { message, fileAttachments = [], stream: enableStreaming, agent } = await request.json();
+    let message, fileAttachments, enableStreaming, agent;
+    try {
+      const body = await request.json();
+      message = body.message;
+      fileAttachments = body.fileAttachments || [];
+      enableStreaming = body.stream;
+      agent = body.agent;
+    } catch (jsonError) {
+      console.error('JSON parse error:', jsonError);
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 },
+      );
+    }
 
     // Validation: Message length
     if (message && message.length > MAX_MESSAGE_LENGTH) {
