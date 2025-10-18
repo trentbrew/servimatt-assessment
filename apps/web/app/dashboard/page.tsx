@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AppSidebar, ChatThread } from '@/components/app-sidebar';
 import { AgentChat } from '@/components/agent-chat';
+import { ErrorBoundary } from '@/components/error-boundary';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -65,12 +66,14 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col items-center justify-center p-4">
           {selectedThread ? (
-            <div className="w-full h-full max-w-4xl" key={selectedThread.id}>
-              <AgentChat
-                chatId={selectedThread.id}
-                currentAgent={currentAgent}
-              />
-            </div>
+            <ErrorBoundary>
+              <div className="w-full h-full max-w-4xl" key={selectedThread.id}>
+                <AgentChat
+                  chatId={selectedThread.id}
+                  currentAgent={currentAgent}
+                />
+              </div>
+            </ErrorBoundary>
           ) : (
             <div className="flex flex-col items-center justify-center text-center space-y-4 min-h-[400px]">
               <div className="rounded-full bg-muted/50 p-6">

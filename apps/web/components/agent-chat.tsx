@@ -445,7 +445,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
               )}
             </div>
           )}
-          <div className="space-y-4">
+          <div className="space-y-4" role="log" aria-label="Chat messages">
             {chatId &&
               messages.length > 0 &&
               messages.map((message, idx) => {
@@ -455,6 +455,8 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                   <div
                     key={idx}
                     className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    role="article"
+                    aria-label={`${message.role === 'user' ? 'User' : 'Assistant'} message`}
                   >
                     {message.role === 'assistant' && (
                       <AgentAvatar agent={currentAgent} />
@@ -502,10 +504,14 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                   <Badge variant="secondary" className="mb-2 text-xs">
                     {currentAgent?.title || 'RAG-Enhanced Agent'}
                   </Badge>
-                  <div className="text-sm prose prose-sm prose-slate dark:prose-invert max-w-none prose-headings:mt-4 prose-headings:mb-2 prose-h1:text-lg prose-h2:text-base prose-h3:text-sm prose-p:mb-2 prose-p:leading-relaxed prose-ul:ml-4 prose-ol:ml-4 prose-li:mb-1 prose-strong:font-semibold prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs">
+                  <div 
+                    className="text-sm prose prose-sm prose-slate dark:prose-invert max-w-none prose-headings:mt-4 prose-headings:mb-2 prose-h1:text-lg prose-h2:text-base prose-h3:text-sm prose-p:mb-2 prose-p:leading-relaxed prose-ul:ml-4 prose-ol:ml-4 prose-li:mb-1 prose-strong:font-semibold prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs"
+                    aria-live="polite"
+                    aria-atomic="false"
+                  >
                     <ReactMarkdown>{streamingMessage}</ReactMarkdown>
                   </div>
-                  <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground" role="status" aria-live="polite">
                     <div className="w-1 h-1 bg-current rounded-full animate-pulse"></div>
                     <span>Streaming...</span>
                   </div>
@@ -517,8 +523,8 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
             {toolStatus && (
               <div className="flex gap-3 items-center">
                 <AgentAvatar agent={currentAgent} />
-                <div className="bg-muted/50 rounded-lg px-4 py-2 flex items-center gap-2">
-                  <div className="flex gap-1">
+                <div className="bg-muted/50 rounded-lg px-4 py-2 flex items-center gap-2" role="status" aria-live="polite">
+                  <div className="flex gap-1" aria-hidden="true">
                     <div
                       className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
                       style={{ animationDelay: '0ms' }}
@@ -595,6 +601,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading || isUploading}
               title="Attach files (CSV, JSON, Markdown, XLSX)"
+              aria-label="Attach files (CSV, JSON, Markdown, XLSX, or TXT)"
               className="h-9 w-9 md:h-10 md:w-10 flex-shrink-0"
             >
               <Paperclip className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -610,6 +617,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                   : 'Ask a question...'
               }
               disabled={isLoading}
+              aria-label="Message input"
               className="flex-1 h-9 md:h-10 text-sm md:text-base"
             />
 
@@ -619,6 +627,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                 isLoading || (!input.trim() && attachedFiles.length === 0)
               }
               size="icon"
+              aria-label="Send message"
               className="h-9 w-9 md:h-10 md:w-10 flex-shrink-0"
             >
               <Send className="w-3.5 h-3.5 md:w-4 md:h-4" />
