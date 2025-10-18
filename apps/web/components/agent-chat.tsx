@@ -127,7 +127,7 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
   const [toolStatus, setToolStatus] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Sidebar state - safely handle SSR
   let sidebarState: 'expanded' | 'collapsed' = 'expanded';
   let isMobile = false;
@@ -354,17 +354,21 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
       });
     } catch (error) {
       console.error('Error:', error);
-      
+
       // Check if it's a rate limit error
       let errorMessage = 'Something went wrong. Please try again.';
       if (error instanceof Error) {
-        if (error.message.includes('Rate limit exceeded') || error.message.includes('429')) {
-          errorMessage = '⏱️ Rate limit reached. You can make 20 requests per hour. Please try again later.';
+        if (
+          error.message.includes('Rate limit exceeded') ||
+          error.message.includes('429')
+        ) {
+          errorMessage =
+            '⏱️ Rate limit reached. You can make 20 requests per hour. Please try again later.';
         } else {
           errorMessage = error.message;
         }
       }
-      
+
       // Save error message to DB
       await addMessage({
         chatId,
@@ -409,7 +413,9 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                     />
                     <AvatarFallback className="bg-primary/10">
                       {ICON_MAP[currentAgent.icon] ? (
-                        React.createElement(ICON_MAP[currentAgent.icon], { className: 'w-10 h-10' })
+                        React.createElement(ICON_MAP[currentAgent.icon], {
+                          className: 'w-10 h-10',
+                        })
                       ) : (
                         <Bot className="w-10 h-10" />
                       )}
@@ -419,7 +425,9 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                   <Avatar className="w-20 h-20">
                     <AvatarFallback className="bg-primary/10">
                       {ICON_MAP[currentAgent.icon] ? (
-                        React.createElement(ICON_MAP[currentAgent.icon], { className: 'w-10 h-10' })
+                        React.createElement(ICON_MAP[currentAgent.icon], {
+                          className: 'w-10 h-10',
+                        })
                       ) : (
                         <Bot className="w-10 h-10" />
                       )}
@@ -442,25 +450,30 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
               )}
 
               {/* Starter Prompts */}
-              {currentAgent.starterPrompts && currentAgent.starterPrompts.length > 0 && (
-                <div className="space-y-2 w-full max-w-md">
-                  <p className="text-sm font-medium mb-3">Start a conversation:</p>
-                  {currentAgent.starterPrompts.map((prompt: string, index: number) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setInput(prompt);
-                        // Optionally auto-submit
-                        // handleSubmit(new Event('submit') as any);
-                      }}
-                      className="w-full text-left px-4 py-3 rounded-lg border border-border bg-muted/30 hover:bg-muted hover:border-primary/50 transition-all text-sm"
-                    >
-                      <span className="text-muted-foreground mr-2">→</span>
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {currentAgent.starterPrompts &&
+                currentAgent.starterPrompts.length > 0 && (
+                  <div className="space-y-2 w-full max-w-md">
+                    <p className="text-sm font-medium mb-3">
+                      Start a conversation:
+                    </p>
+                    {currentAgent.starterPrompts.map(
+                      (prompt: string, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            setInput(prompt);
+                            // Optionally auto-submit
+                            // handleSubmit(new Event('submit') as any);
+                          }}
+                          className="w-full text-left px-4 py-3 rounded-lg border border-border bg-muted/30 hover:bg-muted hover:border-primary/50 transition-all text-sm"
+                        >
+                          <span className="text-muted-foreground mr-2">→</span>
+                          {prompt}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                )}
             </div>
           )}
           <div className="space-y-4" role="log" aria-label="Chat messages">
@@ -522,14 +535,18 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
                   <Badge variant="secondary" className="mb-2 text-xs">
                     {currentAgent?.title || 'RAG-Enhanced Agent'}
                   </Badge>
-                  <div 
+                  <div
                     className="text-sm prose prose-sm prose-slate dark:prose-invert max-w-none prose-headings:mt-4 prose-headings:mb-2 prose-h1:text-lg prose-h2:text-base prose-h3:text-sm prose-p:mb-2 prose-p:leading-relaxed prose-ul:ml-4 prose-ol:ml-4 prose-li:mb-1 prose-strong:font-semibold prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs"
                     aria-live="polite"
                     aria-atomic="false"
                   >
                     <ReactMarkdown>{streamingMessage}</ReactMarkdown>
                   </div>
-                  <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground" role="status" aria-live="polite">
+                  <div
+                    className="flex items-center gap-1 mt-2 text-xs text-muted-foreground"
+                    role="status"
+                    aria-live="polite"
+                  >
                     <div className="w-1 h-1 bg-current rounded-full animate-pulse"></div>
                     <span>Streaming...</span>
                   </div>
@@ -541,7 +558,11 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
             {toolStatus && (
               <div className="flex gap-3 items-center">
                 <AgentAvatar agent={currentAgent} />
-                <div className="bg-muted/50 rounded-lg px-4 py-2 flex items-center gap-2" role="status" aria-live="polite">
+                <div
+                  className="bg-muted/50 rounded-lg px-4 py-2 flex items-center gap-2"
+                  role="status"
+                  aria-live="polite"
+                >
                   <div className="flex gap-1" aria-hidden="true">
                     <div
                       className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
@@ -583,7 +604,11 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
           onSubmit={handleSubmit}
           className="fixed bottom-0 p-3 md:p-4 bg-background/75 backdrop-blur-sm border-t transition-[left]"
           style={{
-            left: isMobile ? 0 : (sidebarState === 'expanded' ? 'var(--sidebar-width)' : '3rem'),
+            left: isMobile
+              ? 0
+              : sidebarState === 'expanded'
+                ? 'var(--sidebar-width)'
+                : '3rem',
             right: 0,
           }}
         >
