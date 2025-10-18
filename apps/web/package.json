@@ -11,7 +11,10 @@
     "start": "next start -p 1290",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@instantdb/admin": "^0.22.21",
@@ -31,11 +34,14 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^20.19.9",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0",
     "typescript": "^5.9.2"
   }
 }
