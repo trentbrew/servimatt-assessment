@@ -347,11 +347,22 @@ export function AgentChat({ chatId, currentAgent }: AgentChatProps) {
       });
     } catch (error) {
       console.error('Error:', error);
+      
+      // Check if it's a rate limit error
+      let errorMessage = 'Something went wrong. Please try again.';
+      if (error instanceof Error) {
+        if (error.message.includes('Rate limit exceeded') || error.message.includes('429')) {
+          errorMessage = '⏱️ Rate limit reached. You can make 20 requests per hour. Please try again later.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       // Save error message to DB
       await addMessage({
         chatId,
         role: 'assistant',
-        content: `Error: ${error instanceof Error ? error.message : 'Something went wrong'}`,
+        content: `Error: ${errorMessage}`,
       });
     } finally {
       setIsLoading(false);
