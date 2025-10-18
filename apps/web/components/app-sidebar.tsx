@@ -218,6 +218,7 @@ export function AppSidebar({
     null,
   );
   const [editingTitle, setEditingTitle] = React.useState('');
+  const [searchQuery, setSearchQuery] = React.useState('');
   const { setOpen } = useSidebar();
 
   // Get agents and chats from InstantDB
@@ -318,7 +319,18 @@ export function AppSidebar({
       ? allChats.filter((chat: any) => chat.agentId === activeItem.agentId)
       : allChats.filter((chat: any) => !hiddenAgentIds.includes(chat.agentId));
     
-    return filteredChats
+    // Apply search filter
+    const searchFiltered = searchQuery.trim()
+      ? filteredChats.filter((chat: any) => {
+          const query = searchQuery.toLowerCase();
+          return (
+            chat.title?.toLowerCase().includes(query) ||
+            chat.lastMessage?.toLowerCase().includes(query)
+          );
+        })
+      : filteredChats;
+    
+    return searchFiltered
       .sort((a: any, b: any) => b.updatedAt - a.updatedAt) // Sort newest first
       .map((chat: any) => ({
         id: chat.id,
@@ -328,7 +340,7 @@ export function AppSidebar({
         agentType: chat.agentType,
         messageCount: chat.messageCount,
       }));
-  }, [allChats, activeItem?.agentId, agents]);
+  }, [allChats, activeItem?.agentId, agents, searchQuery]);
 
   function formatTimestamp(timestamp: number): string {
     const now = Date.now();
@@ -500,12 +512,23 @@ export function AppSidebar({
           <div className="text-xs text-muted-foreground">
             {threads.length} {threads.length === 1 ? 'chat' : 'chats'}
           </div>
-          <SidebarInput placeholder="Search chats..." />
+          <SidebarInput 
+            placeholder="Search chats..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </SidebarHeader>
         <SidebarContent className="overflow-x-hidden">
           <SidebarGroup className="px-0 w-full">
             <SidebarGroupContent className="w-full">
-              {threads.map((thread: any) => (
+              {threads.length === 0 && searchQuery.trim() ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
+                  <MessageSquare className="w-12 h-12 mb-3 opacity-50" />
+                  <p className="text-sm">No chats found</p>
+                  <p className="text-xs mt-1">Try a different search term</p>
+                </div>
+              ) : (
+                threads.map((thread: any) => (
                 <div
                   key={thread.id}
                   className={`group relative hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight last:border-b-0 transition-colors ${
@@ -602,7 +625,8 @@ export function AppSidebar({
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+              )}
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
