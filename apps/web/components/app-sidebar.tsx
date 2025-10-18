@@ -286,7 +286,12 @@ export function AppSidebar({
       },
     ];
 
-    const agentItems = agents.map((agent) => ({
+    // Filter out test agents (e.g., Daria from the 90s show)
+    const productionAgents = agents.filter(
+      (agent) => agent.name?.toLowerCase() !== 'daria'
+    );
+
+    const agentItems = productionAgents.map((agent) => ({
       title: agent.name,
       url: '#',
       icon: ICON_MAP[agent.icon] || Bot,
@@ -303,10 +308,15 @@ export function AppSidebar({
 
   // Convert DB chats to ChatThread format and filter by active agent
   const threads = React.useMemo(() => {
-    // Filter chats for the current active agent
+    // Get IDs of agents to hide (Daria)
+    const hiddenAgentIds = agents
+      .filter((agent) => agent.name?.toLowerCase() === 'daria')
+      .map((agent) => agent.id);
+
+    // Filter chats for the current active agent and exclude hidden agents
     const filteredChats = activeItem?.agentId
       ? allChats.filter((chat: any) => chat.agentId === activeItem.agentId)
-      : allChats;
+      : allChats.filter((chat: any) => !hiddenAgentIds.includes(chat.agentId));
     
     return filteredChats
       .sort((a: any, b: any) => b.updatedAt - a.updatedAt) // Sort newest first
@@ -318,7 +328,7 @@ export function AppSidebar({
         agentType: chat.agentType,
         messageCount: chat.messageCount,
       }));
-  }, [allChats, activeItem?.agentId]);
+  }, [allChats, activeItem?.agentId, agents]);
 
   function formatTimestamp(timestamp: number): string {
     const now = Date.now();
